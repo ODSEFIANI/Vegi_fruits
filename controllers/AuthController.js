@@ -1,9 +1,39 @@
-import { v4 as uuidv4 } from 'uuid';
-import sha1 from 'sha1';
-import redisClient from '../utils/redis';
-import userUtils from '../utils/user';
+const { v4: uuidv4 } = require('uuid');
+const sha1 = require('sha1');
+const redisClient = require('../utils/redis');
+const userUtils = require('../utils/user');
+const dbClient = require('../utils/db'); // Import dbClient
 
 class AuthController {
+  // Middleware for protecting routes
+  static protected(req, res, next) {
+    const token = req.headers.authorization?.split(' ')[1];
+
+    if (!token) {
+      return res.status(401).json({ error: 'Unauthorized: Missing token' });
+    }
+
+    // Verify token validity
+    redisClient.get(`auth_${token}`, (err, userId) => {
+      if (err || !userId) {
+        return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+      }
+      req.userId = userId;
+      next();
+    });
+  }
+
+  // Middleware for restricting access based on user roles
+  static restricted(roles) {
+    return (req, res, next) => {
+      const { role } = req.user;
+
+      if (!roles.includes(role)) {
+        return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
+      }
+      next();
+    };
+  }
   // Sign-in the user by generating a new authentication token
   static async signIn(request, response) {
     const authorizationHeader = request.header('Authorization') || '';
@@ -56,6 +86,51 @@ class AuthController {
 
     return response.status(204).send();
   }
-}
 
-export default AuthController;
+  static async getConnect(request, response) {
+    const authData = request.header('Authorization');
+  
+    if (!authData) {
+      response.status(401).json({ error: 'Unauthorized: Missing Authorization header' });
+      return;
+    }
+  
+    const token = authData.split(' ')[1];
+    const buff = Buffer.from(token, 'base64');
+    const userEmail = buff.toString('ascii');
+    const data = userEmail.split(':'); // contains email and password
+  
+    if (data.length !== 2) {
+      response.status(401).json({ error: 'Unauthorized: Invalid token format' });
+      return;
+    }
+  
+    const hashedPassword = sha1(data[1]);
+    const users = dbClient.db.collection('users');
+  
+    users.findOne({ email: data[0], password: hashedPassword }, async (err, user) => {
+      if (user) {
+        const token = uuidv4();
+        const key = `auth_${token}`;
+        await redisClient.set(key, user._id.toString(), 60 * 60 * 24);
+        response.status(200).json({ token });
+      } else {
+        response.status(401).json({ error: 'Unauthorized: Invalid email or password' });
+      }
+    });
+  }
+
+
+  static async getDisconnect(request, response) {
+    const token = request.header('X-Token');
+    const key = `auth_${token}`;
+    const id = await redisClient.get(key);
+    if (id) {
+      await redisClient.del(key);
+      response.status(204).json({});
+    } else {
+      response.status(401).json({ error: 'Unauthorized' });
+    }
+  }
+}
+module.exports = AuthController;

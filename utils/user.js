@@ -1,5 +1,5 @@
-import redisClient from './redis';
-import dbClient from './db';
+const redisClient = require('./redis');
+const dbClient = require('./db');
 
 // user utilities
 const userUtils = {
@@ -25,4 +25,4 @@ const userUtils = {
   },
 };
 
-export default userUtils;
+module.exports = userUtils;

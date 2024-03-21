@@ -1,5 +1,6 @@
-import redisClient from '../utils/redis';
-import dbClient from '../utils/db';
+const redisClient = require('../utils/redis');
+const dbClient = require('../utils/db');
+
 
 class AppController {
   // check if Redis is alive and if the DB is alive too
@@ -21,4 +22,4 @@ class AppController {
   }
 }
 
-export default AppController;
+module.exports = AppController;
