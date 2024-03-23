@@ -19,45 +19,50 @@ class UsersController {
    * The new user must be saved in the collection users
    */
   static async postNew(request, response) {
-    const { email, password } = request.body;
+    const { email, password, attributes } = request.body;
 
     if (!email) {
-      return response.status(400).send({ error: 'Missing email' });
+        return response.status(400).send({ error: 'Missing email' });
     }
 
     if (!password) {
-      return response.status(400).send({ error: 'Missing password' });
+        return response.status(400).send({ error: 'Missing password' });
     }
 
     const emailExists = await dbClient.usersCollection.findOne({ email });
 
     if (emailExists) {
-      return response.status(400).send({ error: 'Email already exists' });
+        return response.status(400).send({ error: 'Email already exists' });
     }
 
     const sha1Password = sha1(password);
 
     try {
-      const result = await dbClient.usersCollection.insertOne({
-        email,
-        password: sha1Password,
-      });
+        const userData = {
+            email,
+            password: sha1Password,
+            ...attributes  // Spread the optional attributes
+        };
 
-      const user = {
-        id: result.insertedId,
-        email,
-      };
+        const result = await dbClient.usersCollection.insertOne(userData);
 
-      await userQueue.add({
-        userId: result.insertedId.toString(),
-      });
+        const user = {
+            id: result.insertedId,
+            email,
+            ...attributes  // Spread the optional attributes
+        };
 
-      return response.status(201).send(user);
+        await userQueue.add({
+            userId: result.insertedId.toString(),
+        });
+
+        return response.status(201).send(user);
     } catch (error) {
-      console.error('Error creating user:', error);
-      return response.status(500).send({ error: 'Error creating user' });
+        console.error('Error creating user:', error);
+        return response.status(500).send({ error: 'Error creating user' });
     }
-  }
+}
+
 
   // Retrieve the user based on the token used
   static async getMe(request, response) {

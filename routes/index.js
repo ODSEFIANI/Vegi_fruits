@@ -2,6 +2,7 @@ const express = require('express');
 const AppController = require('../controllers/AppController');
 const UsersController = require('../controllers/UsersController');
 const AuthController = require('../controllers/AuthController');
+const ProductController = require('../controllers/ProductController');
 
 function controllerRouting(app) {
   const router = express.Router();
@@ -74,6 +75,9 @@ function controllerRouting(app) {
   router.get('/files/:id/data', (req, res) => {
     FilesController.getFile(req, res);
   });
-}
 
+  router.post('/api/addproduct', (req, res) => {
+    ProductController.addProduct(req, res);
+});
+}
 module.exports = controllerRouting;
