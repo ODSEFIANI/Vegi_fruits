@@ -20,6 +20,7 @@ class UsersController {
    */
   static async postNew(request, response) {
     const { email, password, attributes } = request.body;
+    console.log(request.body)
 
     if (!email) {
         return response.status(400).send({ error: 'Missing email' });

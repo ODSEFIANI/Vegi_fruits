@@ -77,7 +77,7 @@ function controllerRouting(app) {
   });
 
   router.post('/api/addproduct', (req, res) => {
-    ProductController.addProduct(req, res);
+    ProductController.CreateProduct(req, res);
 });
 }
 module.exports = controllerRouting;
