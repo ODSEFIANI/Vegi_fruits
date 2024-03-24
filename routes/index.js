@@ -4,6 +4,7 @@ const UsersController = require('../controllers/UsersController');
 const AuthController = require('../controllers/AuthController');
 const ProductController = require('../controllers/ProductController');
 const ProController = require('../controllers/ProController');
+const OrderController = require('../controllers/OrderController');
 
 function controllerRouting(app) {
   const router = express.Router();
@@ -83,6 +84,10 @@ function controllerRouting(app) {
 
 router.post('/api/Createproduct',(req, res) => {
   ProController.CreateProduct(req, res);
+});
+
+router.post('/api/addorder', (req, res) => {
+  OrderController.addOrder(req, res);
 });
 
 router.get('/api/products', AuthController.auth, (req, res) => {

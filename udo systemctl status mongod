@@ -1,0 +1,12 @@
+[0;1;31m●[0m mongod.service - MongoDB Database Server
+     Loaded: loaded (/etc/systemd/system/mongod.service; enabled; vendor preset: enabled)
+     Active: [0;1;31mfailed[0m (Result: exit-code) since Sat 2024-03-23 11:49:59 +00; 13s ago
+       Docs: https://docs.mongodb.org/manual
+    Process: 70095 ExecStart=/usr/bin/mongod --config /etc/mongod.conf [0;1;31m(code=exited, status=217/USER)[0m
+   Main PID: 70095 (code=exited, status=217/USER)
+
+Mar 23 11:49:59 Envy systemd[1]: mongod.service: Scheduled restart job, restart counter is at 5.
+Mar 23 11:49:59 Envy systemd[1]: Stopped MongoDB Database Server.
+Mar 23 11:49:59 Envy systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mmongod.service: Start request repeated too quickly.[0m
+Mar 23 11:49:59 Envy systemd[1]: [0;1;38;5;185m[0;1;39m[0;1;38;5;185mmongod.service: Failed with result 'exit-code'.[0m
+Mar 23 11:49:59 Envy systemd[1]: [0;1;31m[0;1;39m[0;1;31mFailed to start MongoDB Database Server.[0m
