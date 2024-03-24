@@ -2,6 +2,11 @@ const Product = require('../models/productModel.js');
 const AppError = require('../utils/AppError.js');
 const asyncWrapper = require('../utils/asyncWrapper');
 const dbClient = require('../utils/db');
+const { getMe } = require('../controllers/UsersController');
+
+// Instantiate UsersController
+
+
 
 /**
  * Retrieve products of a farmer
@@ -122,17 +127,59 @@ class ProductController {
         }
     
     }
-    static async addProduct(req, res, next) {
+    static async addProduct(request, res) {
         try {
-            const { user, name, price, quantity, description } = req.body;
-            console.log(request.body);
-           // console.log(user, name, price, quantity, description);
-            res.status(200).json({ message: "Data extracted successfully." });
+            // Call getMe function to retrieve the user object
+            const user = await getMe(request);
+            console.log(user);
+    
+            // Extract user ID from the user object
+            const userId = user._id;
+    
+            // Extract product details from the request body
+            const { name, price, quantity, description } = request.body;
+    
+            // Create a product object
+            const productData = {
+                user: userId, // Use userId directly without accessing _id again
+                name,
+                price,
+                quantity,
+                description 
+            };
+            console.log(productData);
+    
+            // Create the product in the database (assuming Product is a Mongoose model)
+            const result = await dbClient.productsCollection.insertOne(productData);
+    
+          // Return a success response with the created product
+          return res.status(201).json({
+            status: 'success',
+            data: {
+              productData
+            }
+          });
         } catch (error) {
-            console.error('Error:', error);
-            res.status(500).json({ message: "Internal server error." });
+          // Handle any errors that occur during product creation
+          console.error('Error adding product:', error);
+          return res.status(500).json({
+            status: 'error',
+            message: 'Error adding product'
+          });
         }
+      }
+    
+      // Retrieve all products
+    static async getAllProducts(req, res) {
+        try {
+        const products = await Product.find();
+        return res.status(200).json(products);
+        } catch (error) {
+        console.error('Error retrieving products:', error);
+        return res.status(500).json({ error: 'Error retrieving products' });
+        }
+    }  
     }
-}
+    
     
     module.exports = ProductController;

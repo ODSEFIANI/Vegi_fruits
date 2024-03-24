@@ -2,14 +2,15 @@ const Product = require('../models/productModel.js');
 const AppError = require('../utils/AppError.js');
 const asyncWrapper = require('../utils/asyncWrapper');
 
-class ProductController {
+class ProController {
     static async CreateProduct(request, response) {
         try {
             const { userId, attributes } = request.body;
+            console.log(userId, attributes)
 
             // Assuming you have a Product model
             const product = await Product.create({
-                owner: userId, // Assuming userId corresponds to the owner of the product
+                user: userId, // Assuming userId corresponds to the owner of the product
                 ...attributes
             });
 
@@ -29,4 +30,4 @@ class ProductController {
     }
 }
 
-module.exports = ProductController;
+module.exports = ProController;

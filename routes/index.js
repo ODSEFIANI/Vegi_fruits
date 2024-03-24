@@ -3,6 +3,7 @@ const AppController = require('../controllers/AppController');
 const UsersController = require('../controllers/UsersController');
 const AuthController = require('../controllers/AuthController');
 const ProductController = require('../controllers/ProductController');
+const ProController = require('../controllers/ProController');
 
 function controllerRouting(app) {
   const router = express.Router();
@@ -76,8 +77,17 @@ function controllerRouting(app) {
     FilesController.getFile(req, res);
   });
 
-  router.post('/api/addproduct', (req, res) => {
-    ProductController.CreateProduct(req, res);
+  router.post('/api/addproduct', AuthController.auth,AuthController.restricted(),(req, res) => {
+    ProductController.addProduct(req, res);
+});
+
+router.post('/api/Createproduct',(req, res) => {
+  ProController.CreateProduct(req, res);
+});
+
+router.get('/api/products', AuthController.auth, (req, res) => {
+  ProductController.getAllProducts(req, res);
+
 });
 }
 module.exports = controllerRouting;

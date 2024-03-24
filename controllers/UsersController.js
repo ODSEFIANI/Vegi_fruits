@@ -78,9 +78,9 @@ class UsersController {
         return response.status(401).send({ error: 'Unauthorized' });
       }
 
-      const { _id, password, ...processedUser } = user;
+      const {password, ...processedUser } = user;
 
-      return response.status(200).send(processedUser);
+      return (processedUser);
     } catch (error) {
       console.error('Error retrieving user:', error);
       return response.status(500).send({ error: 'Error retrieving user' });

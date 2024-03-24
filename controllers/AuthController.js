@@ -2,6 +2,8 @@ const { v4: uuidv4 } = require('uuid');
 const sha1 = require('sha1');
 const redisClient = require('../utils/redis');
 const userUtils = require('../utils/user');
+const UsersController = require('../controllers/UsersController');
+
 const dbClient = require('../utils/db'); // Import dbClient
 
 class AuthController {
@@ -23,17 +25,47 @@ class AuthController {
     });
   }
 
-  // Middleware for restricting access based on user roles
-  static restricted(roles) {
-    return (req, res, next) => {
-      const { role } = req.user;
 
-      if (!roles.includes(role)) {
-        return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
+  // Middleware for restricting access based on user roles
+  static restricted() {
+    return async (req, res, next) => {
+      try {
+        const user = await UsersController.getMe(req, res);
+
+        if (!user) {
+          return res.status(401).json({ error: 'Unauthorized: User not found' });
+        }
+
+        // Check if user has the role of "farmer"
+        if (user.userType !== 'farmer') {
+          return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
+        }
+
+        next();
+      } catch (error) {
+        console.error('Error retrieving user:', error);
+        return res.status(500).json({ error: 'Error retrieving user' });
       }
-      next();
     };
   }
+    // Middleware for protecting routes
+    static auth(req, res, next) {
+      userUtils.getUserIdAndKey(req)
+        .then(({ userId }) => {
+          if (!userId) {
+            return res.status(401).json({ error: 'Unauthorized: Missing or invalid token' });
+          }
+          req.userId = userId;
+          console.log("authenticated");
+          next();
+        })
+        .catch(error => {
+          console.error('Error retrieving user:', error);
+          return res.status(500).json({ error: 'Error retrieving user' });
+        });
+    }
+
+
   // Sign-in the user by generating a new authentication token
   static async signIn(request, response) {
     const authorizationHeader = request.header('Authorization') || '';
@@ -132,5 +164,6 @@ class AuthController {
       response.status(401).json({ error: 'Unauthorized' });
     }
   }
+  
 }
 module.exports = AuthController;
