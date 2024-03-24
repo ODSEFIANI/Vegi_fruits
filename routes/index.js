@@ -89,5 +89,13 @@ router.get('/api/products', AuthController.auth, (req, res) => {
   ProductController.getAllProducts(req, res);
 
 });
+router.get('/api/products/:productId', (req, res) => {
+  ProductController.getProductById(req, res);
+});
+
+// DELETE /api/products/:productId
+router.delete('/api/products/:productId', AuthController.auth, ProductController.deleteProductById);
+
+
 }
 module.exports = controllerRouting;

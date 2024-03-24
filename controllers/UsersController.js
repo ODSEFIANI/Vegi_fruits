@@ -69,18 +69,23 @@ class UsersController {
   static async getMe(request, response) {
     try {
       const { userId } = await userUtils.getUserIdAndKey(request);
-
+  
       const user = await userUtils.getUser({
-        _id: ObjectId(userId),
+        _id: userId,
       });
-
+  
       if (!user) {
         return response.status(401).send({ error: 'Unauthorized' });
       }
-
-      const {password, ...processedUser } = user;
-
-      return (processedUser);
+  
+      // Convert Mongoose document to plain JavaScript object
+      const plainUser = user.toObject();
+  
+      // Remove the password field from the user object
+      delete plainUser.password;
+  
+      console.log(plainUser);
+      return (plainUser);
     } catch (error) {
       console.error('Error retrieving user:', error);
       return response.status(500).send({ error: 'Error retrieving user' });

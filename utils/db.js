@@ -1,32 +1,35 @@
-const { MongoClient } = require('mongodb');
+const mongoose = require('mongoose');
 
 const DB_HOST = process.env.DB_HOST || 'localhost';
 const DB_PORT = process.env.DB_PORT || 27017;
 const DB_DATABASE = process.env.DB_DATABASE || 'fruits_shop';
-const url = `mongodb://${DB_HOST}:${DB_PORT}`;
 
 class DBClient {
   constructor() {
-    this.db = null;
-    this.usersCollection = null;
-    this.productsCollection = null;
     this.connect();
+    this.db = mongoose.connection;
+    this.usersCollection = null; // Mongoose models will handle collections
+    this.productsCollection = null; // Mongoose models will handle collections
   }
 
   async connect() {
     try {
-      const client = await MongoClient.connect(url, { useNewUrlParser: true ,useUnifiedTopology: true });
-      this.db = client.db(DB_DATABASE);
-      this.usersCollection = this.db.collection('users');
-      this.productsCollection = this.db.collection('products');
+      await mongoose.connect(`mongodb://${DB_HOST}:${DB_PORT}/${DB_DATABASE}`, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+      });
       console.log('Connected successfully to MongoDB server');
+
+      // Initialize Mongoose models
+      this.usersCollection = require('../models/UserModel'); // Adjust the path as per your file structure
+      this.productsCollection = require('../models/productModel'); // Adjust the path as per your file structure
     } catch (error) {
       console.error('Error connecting to MongoDB:', error.message);
     }
   }
 
   isAlive() {
-    return Boolean(this.db);
+    return this.db.readyState === 1; // Check if Mongoose connection is open
   }
 
   async nbUsers() {
@@ -43,3 +46,4 @@ class DBClient {
 const dbClient = new DBClient();
 
 module.exports = dbClient;
+

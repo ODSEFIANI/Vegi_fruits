@@ -37,8 +37,10 @@ class AuthController {
         }
 
         // Check if user has the role of "farmer"
+        console.log("debuging this line to test wheter the object is retrievced ",user, "debuging this line to test wheter the object is retrievced");
+        console.log(user.userType);
         if (user.userType !== 'farmer') {
-          return res.status(403).json({ error: 'Forbidden: Insufficient permissions' });
+          return res.status(403).json({ error: `Forbidden: Insufficient permissions. You are ${user.userType}` });
         }
 
         next();
@@ -96,7 +98,7 @@ class AuthController {
 
     const token = uuidv4();
     const key = `auth_${token}`;
-    const hoursForExpiration = 24;
+    const hoursForExpiration = 120;
 
     await redisClient.set(key, user._id.toString(), 'EX', hoursForExpiration * 3600);
 
