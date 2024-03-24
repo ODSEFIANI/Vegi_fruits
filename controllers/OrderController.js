@@ -2,6 +2,7 @@ const Order = require('../models/orderModel');
 const AppError = require('../utils/AppError.js');
 const asyncWrapper = require('../utils/asyncWrapper');
 const User = require('../models/userModel');
+const dbClient = require('../utils/db.js');
 
 class OrderController {
   static async viewOrderHistory(req, res, next) {
@@ -70,31 +71,32 @@ class OrderController {
     }
   }
 
-  static async addOrder(req, res, next) {
+  static async addOrder(request, response) {
     try {
-      const user = await User.findById(req.user._id);
-      if (!user || user.userType !== 'buyer') {
-        return next(new AppError('You are not authorized to the wanted process, Only registered buyers can place an order', 401));
-      }
-      const { product, quantity, totalPrice } = req.body;
-      console.log(req.body);
-      const newOrder = new Order({
-        product,
-        quantity,
-        totalPrice,
-        owner: req.user._id,
-      });
-      const savedOrder = await newOrder.save();
-      res.status(201).json({
-        status: 'success',
-        data: {
-          order: savedOrder,
-        },
-      });
+      const user = await User.findById({ _id: request.ObjectId});
+        if (!user || user.userType !== 'client') {
+            return response.status(401).send({ error: 'Unauthorized to add order' });
+        }
+        
+        const { product, quantity, totalPrice } = request.body;
+        if (!product || !quantity || !totalPrice) {
+            return response.status(400).send({ error: 'Missing required fields in request body' });
+        }
+
+        const orderData = {
+            product,
+            quantity,
+            totalPrice,
+            owner: request.userId,
+        };
+
+        const newOrder = await dbClient.ordersCollection.insertOne(orderData);
+        response.status(201).send({ message: 'Order added successfully', order: newOrder.ops[0] });
     } catch (error) {
-      next(new AppError('Failed to add the order. Please try again later.', 500));
+        console.error('Failed to add order:', error);
+        response.status(500).send({ error: 'Failed to add order. Please try again later.' });
     }
-  }
 }
 
+}
 module.exports = OrderController;

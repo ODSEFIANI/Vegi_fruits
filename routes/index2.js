@@ -26,7 +26,7 @@ router.put('/api/products/:id', ProductController.updateProduct);
 router.delete('/api/products/:id', ProductController.deleteProduct);
 
 // Order Routes
-router.post('/api/orders', OrderController.placeOrder);
+router.post('/api/addorder', asyncMiddleware(OrderController.addOrder));
 router.get('/api/orders', OrderController.getAllOrders);
 router.get('/api/orders/:id', OrderController.getOrderById);
 router.put('/api/orders/:id', OrderController.updateOrder);

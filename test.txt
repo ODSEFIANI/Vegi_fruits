@@ -4,10 +4,10 @@ POST http://localhost:5000/users HTTP/1.1
 content-type: application/json
 
 {
-    "email": "client@example.com",
+    "email": "farmer@example.com",
     "password": "your_password",
     "attributes": {
-        "userType": "client",
+        "userType": "Farmer",
         "farm_name": "Your Farm Name",
         "location": "Your Location"
     }
@@ -85,6 +85,18 @@ X-Token: f0e15d5b-cc4f-4eeb-a0ec-46564bb69d43
     "description": "Product Description"
 }
 
+ """ ex 2 ""
+POST http://localhost:5000/api/addproduct HTTP/1.1
+Content-Type: application/json
+X-Token: 65fefabac5e4e77df2b4ce0c
+
+{
+    "name": "banana",
+    "price": 50,
+    "quantity": 10,
+    "description": "Natural bananas"
+}
+
 
 """ HERE we test restricted() midleware trying : to add product with client account"""
 
@@ -114,5 +126,18 @@ Content-Type: application/json
         "price": 100,
         "quantity": 1,
         "description": "Product Description"
+    }
+}
+
+""" place an order """
+POST http://localhost:5000/api/addorder HTTP/1.1
+Content-Type: application/json
+
+{
+    "userId": "66004da3635ef48803d19124",
+    "attributes": {
+        "name": "orange",
+        "price": 30,
+        "quantity": 2
     }
 }
