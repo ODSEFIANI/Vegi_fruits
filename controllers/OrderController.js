@@ -81,16 +81,16 @@ class OrderController {
         }
         const userId = user._id.toString();
         
-        const { product, quantity, totalPrice } = request.body;
-        if (!product || !quantity || !totalPrice) {
+        const { product, quantity, price } = request.body;
+        if (!product || !quantity || !price) {
             return response.status(400).send({ error: 'Missing required fields in request body' });
         }
 
         const orderData = {
             product,
             quantity,
-            totalPrice,
-            owner: request.userId,
+            price,
+            owner: userId,
         };
         console.log(orderData);
         const newOrder = await Order.create(orderData);
