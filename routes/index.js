@@ -97,6 +97,9 @@ router.get('/api/products', AuthController.auth, (req, res) => {
 router.get('/api/products/:productId', (req, res) => {
   ProductController.getProductById(req, res);
 });
+router.get('/api/viewOrderHistory', (req, res) => {
+OrderController.viewOrderHistory(req, res);
+});
 
 // DELETE /api/products/:productId
 router.delete('/api/products/:productId', AuthController.auth, ProductController.deleteProductById);

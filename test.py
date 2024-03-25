@@ -2,8 +2,8 @@
 
 import base64
 
-email = "client2@example.com"
-password = "clientclient"
+email = "farmer@myfarm.com"
+password = "farmpassword"
 
 # Concatenate email and password with a colon
 credentials = f"{email}:{password}"
