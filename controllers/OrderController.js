@@ -1,8 +1,9 @@
 const Order = require('../models/orderModel');
 const AppError = require('../utils/AppError.js');
 const asyncWrapper = require('../utils/asyncWrapper');
-const User = require('../models/userModel');
+const User = require('../models/UserModel.js');
 const dbClient = require('../utils/db.js');
+const { getMe } = require('./UsersController.js');
 
 class OrderController {
   static async viewOrderHistory(req, res, next) {
@@ -73,10 +74,12 @@ class OrderController {
 
   static async addOrder(request, response) {
     try {
-      const user = await User.findById({ _id: request.ObjectId});
+      const user = await getMe(request)
+      console.log(user);
         if (!user || user.userType !== 'client') {
             return response.status(401).send({ error: 'Unauthorized to add order' });
         }
+        const userId = user._id.toString();
         
         const { product, quantity, totalPrice } = request.body;
         if (!product || !quantity || !totalPrice) {
@@ -89,8 +92,8 @@ class OrderController {
             totalPrice,
             owner: request.userId,
         };
-
-        const newOrder = await dbClient.ordersCollection.insertOne(orderData);
+        console.log(orderData);
+        const newOrder = await Order.create(orderData);
         response.status(201).send({ message: 'Order added successfully', order: newOrder.ops[0] });
     } catch (error) {
         console.error('Failed to add order:', error);

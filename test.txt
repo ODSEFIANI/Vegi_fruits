@@ -13,7 +13,18 @@ content-type: application/json
     }
 }
 
+POST http://localhost:5000/users HTTP/1.1
+content-type: application/json
 
+{
+    "email": "client2@example.com",
+    "password": "clientclient",
+    "attributes": {
+        "userType": "client",
+        "farm_name": "Your Farm Name",
+        "location": "Your Location"
+    }
+}
 
 
 """ Sign in and connect using existing account

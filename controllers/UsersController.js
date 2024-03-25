@@ -4,7 +4,6 @@ const Queue = require('bull');
 const dbClient = require('../utils/db');
 const userUtils = require('../utils/user');
 const User = require('../models/UserModel');
-
 const userQueue = new Queue('userQueue');
 
 class UsersController {
