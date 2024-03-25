@@ -81,20 +81,21 @@ class OrderController {
         }
         const userId = user._id.toString();
         
-        const { product, quantity, price } = request.body;
-        if (!product || !quantity || !price) {
+        const { product, quantity, price } = request.body.attributes;
+        console.log("requestbody",request.body);
+        /*if (!product || !quantity || !price) {
             return response.status(400).send({ error: 'Missing required fields in request body' });
-        }
+        }**/
 
         const orderData = {
-            product,
-            quantity,
-            price,
+            product:product,
+            quantity:quantity,
+            price:price,
             owner: userId,
         };
-        console.log(orderData);
+        console.log("final console",orderData);
         const newOrder = await Order.create(orderData);
-        response.status(201).send({ message: 'Order added successfully', order: newOrder.ops[0] });
+        response.status(201).send({ message: 'Order added successfully'});
     } catch (error) {
         console.error('Failed to add order:', error);
         response.status(500).send({ error: 'Failed to add order. Please try again later.' });
