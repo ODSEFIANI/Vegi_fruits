@@ -3,6 +3,7 @@ const sha1 = require('sha1');
 const Queue = require('bull');
 const dbClient = require('../utils/db');
 const userUtils = require('../utils/user');
+const User = require('../models/UserModel');
 
 const userQueue = new Queue('userQueue');
 
@@ -45,17 +46,13 @@ class UsersController {
             ...attributes  // Spread the optional attributes
         };
 
-        const result = await dbClient.usersCollection.insertOne(userData);
+        const result = await User.create(userData);
 
         const user = {
             id: result.insertedId,
             email,
             ...attributes  // Spread the optional attributes
         };
-
-        await userQueue.add({
-            userId: result.insertedId.toString(),
-        });
 
         return response.status(201).send(user);
     } catch (error) {
