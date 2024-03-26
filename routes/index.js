@@ -101,6 +101,10 @@ router.get('/api/viewOrderHistory', (req, res) => {
 OrderController.viewOrderHistory(req, res);
 });
 
+router.get('/api/orders', AuthController.auth, (req, res) => {
+  ProductController.getAllOrders(req, res);
+});
+
 // DELETE /api/products/:productId
 router.delete('/api/products/:productId', AuthController.auth, ProductController.deleteProductById);
 

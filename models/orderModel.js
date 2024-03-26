@@ -6,7 +6,8 @@ const orderSchema = new Schema({
   product: [{ type: Schema.Types.ObjectId, ref: 'Product' }],
   price: { type: Number, required: true },
   status: { type: String, enum: ['pending', 'shipped', 'delivered'], default: 'pending' },
-  createdAt: { type: Date, default: Date.now }
+  createdAt: { type: Date, default: Date.now },
+  quantity: { type: Number, required: true },
 });
 
 module.exports = mongoose.model('Order', orderSchema);

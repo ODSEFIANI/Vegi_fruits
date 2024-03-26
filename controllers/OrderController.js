@@ -55,6 +55,16 @@ class OrderController {
     }
   }
 
+  static async getAllOrders(req, res) {
+    try {
+    const orders = await Order.find();
+    return res.status(200).json(orders);
+    } catch (error) {
+    console.error('Error retrieving orders:', error);
+    return res.status(500).json({ error: 'Error retrieving orders' });
+    }
+}
+
   static async handleReturns(req, res, next) {
     try {
       const { orderId } = req.params;
