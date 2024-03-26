@@ -118,7 +118,7 @@ class OrderController {
             product:product,
             quantity:quantity,
             price:price,
-            owner: userId,
+            user: userId,
         };
         console.log("final console",orderData);
         const newOrder = await Order.create(orderData);
