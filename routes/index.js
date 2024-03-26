@@ -80,33 +80,42 @@ function controllerRouting(app) {
 
   router.post('/api/addproduct', AuthController.auth,AuthController.restricted(),(req, res) => {
     ProductController.addProduct(req, res);
-});
+  });
 
-router.post('/api/Createproduct',(req, res) => {
-  ProController.CreateProduct(req, res);
-});
+  router.post('/api/Createproduct',(req, res) => {
+    ProController.CreateProduct(req, res);
+  });
 
-router.post('/api/addorder', (req, res) => {
-  OrderController.addOrder(req, res);
-});
+  router.post('/api/addorder', (req, res) => {
+    OrderController.addOrder(req, res);
+  });
 
-router.get('/api/products', AuthController.auth, (req, res) => {
-  ProductController.getAllProducts(req, res);
+  router.get('/api/products', AuthController.auth, (req, res) => {
+    ProductController.getAllProducts(req, res);
+  });
 
-});
-router.get('/api/products/:productId', (req, res) => {
-  ProductController.getProductById(req, res);
-});
-router.get('/api/viewOrderHistory', (req, res) => {
-OrderController.viewOrderHistory(req, res);
-});
+  router.get('/api/products/:productId', (req, res) => {
+    ProductController.getProductById(req, res);
+  });
 
-router.get('/api/orders', AuthController.auth, (req, res) => {
-  ProductController.getAllOrders(req, res);
-});
+  router.get('/api/viewOrderHistory', (req, res) => {
+    OrderController.viewOrderHistory(req, res);
+  });
 
-// DELETE /api/products/:productId
-router.delete('/api/products/:productId', AuthController.auth, ProductController.deleteProductById);
+  router.get('/api/orders', AuthController.auth, (req, res) => {
+    OrderController.getAllOrders(req, res);
+  });
+
+  router.get('/api/orders/:productId', AuthController.auth, (req, res) => {
+    OrderController.viewProductOrders(req, res);
+  });
+
+  router.put('/api/orders/:orderId/updateStatus', AuthController.auth, (req, res) => {
+    OrderController.updateOrderStatus(req, res);
+  });
+
+  // DELETE /api/products/:productId
+  router.delete('/api/products/:productId', AuthController.auth, ProductController.deleteProductById);
 
 
 }

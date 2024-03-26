@@ -7,90 +7,7 @@ const { getMe } = require('./UsersController.js');
 const Product = require('../models/productModel.js');
 
 class OrderController {
-  static async viewOrderHistory(request, response) {
-    try {
-        const user = await getMe(request);
-        if (!user || user.userType !== 'client') {
-            return response.status(401).send({ error: 'Unauthorized to view order history' });
-        }
-        const userId = user._id.toString();
-        console.log("user id",userId);
-        const orders = await Order.find({ user: userId });
-        console.log("orders",orders);
-        if (orders.length > 0) {
-            return response.status(200).json({ orders });
-        } else {
-            return response.status(200).json({"no orders are found": []});
-        }
-    } catch (error) {
-        // Handle any errors that occur during the process
-        console.error('Failed to fetch order history:', error);
-        return response.status(500).send({ error: 'Failed to fetch order history. Please try again later.' });
-    }
-}
-
-  static async updateOrderStatus(req, res, next) {
-    try {
-      const { orderId } = req.params;
-      const { status } = req.body;
-
-      const order = await Order.findOneAndUpdate(
-        { _id: orderId, owner: req.user._id },
-        { status },
-        { new: true }
-      );
-
-      if (!order) {
-        return next(new AppError('Order not found or you do not have permission to update', 404));
-      }
-
-      res.status(200).json({
-        status: 'success',
-        data: {
-          order,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  static async getAllOrders(req, res) {
-    try {
-    const orders = await Order.find();
-    return res.status(200).json(orders);
-    } catch (error) {
-    console.error('Error retrieving orders:', error);
-    return res.status(500).json({ error: 'Error retrieving orders' });
-    }
-}
-
-  static async handleReturns(req, res, next) {
-    try {
-      const { orderId } = req.params;
-
-      const order = await Order.findOneAndUpdate(
-        { _id: orderId, owner: req.user._id },
-        { returned: true },
-        { new: true }
-      );
-
-      if (!order) {
-        return next(new AppError('Order not found or you do not have permission to update', 404));
-      }
-
-      res.status(200).json({
-        status: 'success',
-        data: {
-          order,
-        },
-      });
-    } catch (error) {
-      next(error);
-    }
-  }
-
-// ---------------------- Add Order ----------------------
+/* ---------------------- Add Order ---------------------- */
   static async addOrder(request, response) {
     /**
      * Add an order to the database
@@ -140,6 +57,110 @@ class OrderController {
         response.status(500).send({ error: 'Failed to add order. Please try again later.' });
     }
 }
+ /* ---------------------------------------------------------------------- */
 
+  /* ---------------------- View Order History ---------------------- */
+  static async viewOrderHistory(request, response) {
+    /**
+   * View order history for a client
+   * fetch the user from the request object using the getMe function
+   * check if the user is a client
+   * get the user ID
+   * query the orders collection to find orders for the user
+   * send a success response with the orders
+   * send an empty array if no orders are found
+   * handle any errors that occur during the process
+   * send an error response if an error occurs
+   */
+    try {
+        const user = await getMe(request);
+        if (!user || user.userType !== 'client') {
+            return response.status(401).send({ error: 'Unauthorized to view order history' });
+        }
+        const userId = user._id.toString();
+        console.log("user id",userId);
+        const orders = await Order.find({ user: userId });
+        console.log("orders",orders);
+        if (orders.length > 0) {
+            return response.status(200).json({ orders });
+        } else {
+            return response.status(200).json({"no orders are found": []});
+        }
+    } catch (error) {
+        // Handle any errors that occur during the process
+        console.error('Failed to fetch order history:', error);
+        return response.status(500).send({ error: 'Failed to fetch order history. Please try again later.' });
+    }
+}
+/* ---------------------------------------------------------------------- */
+
+  /* ---------------------- GET ALL ORDERS  ---------------------- */
+  static async getAllOrders(req, res) {
+    /**
+     * Retrieve all orders from the database
+     * query the orders collection to find all orders
+     * send a success response with the orders
+     * handle any errors that occur during the process
+     * send an error response if an error occurs
+     * Only farmers are authorised to view all orders !!!!
+     */
+    try {
+    const orders = await Order.find();
+    return res.status(200).json(orders);
+    } catch (error) {
+    console.error('Error retrieving orders:', error);
+    return res.status(500).json({ error: 'Error retrieving orders' });
+    }
+}
+/* --------------------------------------------------------------------- */
+
+/* ---------------------- GET ORDERS BY PRODUCT  ---------------------- */
+static async viewProductOrders(request, response) {
+  /**
+   * View order history for a product
+   * get the product ID from the request parameters
+   * query the orders collection to find orders for the product
+   * send a success response with the orders
+   * send a message if no orders are found
+   * handle any errors that occur during the process
+   * send an error response if an error occurs
+   */
+  try {
+      const productId = request.params.productId;
+      const orders = await Order.find({ product: productId });
+        if (orders.length > 0) {
+          return response.status(200).json({ orders });
+      } else {
+          return response.status(200).json({ message: 'No orders found for the specified product' });
+      }
+  } catch (error) {
+      console.error('Failed to fetch product order history:', error);
+      return response.status(500).send({ error: 'Failed to fetch product order history. Please try again later.' });
+  }
+}
+/* -------------------------------------------------------------- */
+
+/* ---------------------- UPDATE ORDER STATUS ---------------------- */
+static async updateOrderStatus(request, response) {
+  try {
+    const orderId = request.params.orderId;
+    const { status } = request.body;
+
+    const order = await Order.findById(orderId);
+    if (!order) {
+      return response.status(404).json({ error: 'Order not found' });
+    }
+
+    order.status = status;
+    await order.save();
+
+    return response.status(200).json({ message: 'Order status updated successfully', order});
+  } catch (error) {
+    console.error('Failed to update order status:', error);
+    return response.status(500).json({ error: 'Failed to update order status. Please try again later.' });
+  }
+}
+
+/* ----------------------------------------------------------------- */
 }
 module.exports = OrderController;
