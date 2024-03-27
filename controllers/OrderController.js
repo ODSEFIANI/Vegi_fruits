@@ -23,11 +23,12 @@ class OrderController {
 
     try {
       const user = await getMe(request)
+      console.log("user",user);
         if (!user || user.userType !== 'client') {
             return response.status(401).send({ error: 'Unauthorized to add order' });
         }
         const userId = user._id.toString();
-        
+        console.log("user id",userId);
         const { product, quantity, price } = request.body.attributes;
         /*if (!product || !quantity || !price) {
             return response.status(400).send({ error: 'Missing required fields in request body' });
@@ -144,8 +145,8 @@ static async viewProductOrders(request, response) {
 static async updateOrderStatus(request, response) {
   try {
     const orderId = request.params.orderId;
-    const { status } = request.body;
-
+    const { status } = request.body.attributes;
+    console.log("status",status);
     const order = await Order.findById(orderId);
     if (!order) {
       return response.status(404).json({ error: 'Order not found' });

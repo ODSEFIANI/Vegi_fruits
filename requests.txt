@@ -1,0 +1,156 @@
+/*********** step1 : create account (farmer/client) *************/
+------ client
+
+POST http://localhost:5000/users HTTP/1.1
+content-type: application/json
+
+{
+    "email": "client@example.com",
+    "password": "clientpass",
+    "attributes": {
+        "userType": "client",
+        "farm_name": "no farm",
+        "location": "morocco"
+    }
+}
+
+------- farmer 
+
+POST http://localhost:5000/users HTTP/1.1
+content-type: application/json
+
+{
+    "email": "farmer@example.com",
+    "password": "farmerpass",
+    "attributes": {
+        "userType": "farmer",
+        "farm_name": "best farm",
+        "location": "morocco"
+    }
+}
+/********** step2 : use Py function to generate a base 64 key ********/
+
+/*********** step 3: send req with the key to generate an X-token ******/
+
+GET http://0.0.0.0:5000/connect HTTP/1.1
+content-type: application/json
+Authorization: Basic Y2xpZW50QGV4YW1wbGUuY29tOmNsaWVudHBhc3M=
+
+
+save the tokens : 
+                Farmer : a7f7dfc0-5578-4e5f-b68c-b5c844efc27b
+                Client : 13fea87e-3334-4fe6-8169-79dea2eba6bf
+
+ /************** step 4: As a farmer, add 3 products. *******/
+
+ ------- product 1
+
+ POST http://localhost:5000/api/addproduct HTTP/1.1
+Content-Type: application/json
+X-Token: a7f7dfc0-5578-4e5f-b68c-b5c844efc27b
+
+{
+    "name": "peach",
+    "price": 70,
+    "quantity": 20,
+    "description": "delicious"
+}
+
+------ product 2 
+
+ POST http://localhost:5000/api/addproduct HTTP/1.1
+Content-Type: application/json
+X-Token: a7f7dfc0-5578-4e5f-b68c-b5c844efc27b
+
+{
+    "name": "kiwi",
+    "price": 50,
+    "quantity": 15,
+    "description": "the best kiwi ever"
+}
+
+ -------- product 3 
+
+  POST http://localhost:5000/api/addproduct HTTP/1.1
+Content-Type: application/json
+X-Token: a7f7dfc0-5578-4e5f-b68c-b5c844efc27b
+
+{
+    "name": "orange",
+    "price": 30,
+    "quantity": 20,
+    "description": "very sweet"
+}
+
+/************** step 5: Get all Products added ********/
+
+GET http://localhost:5000/api/products HTTP/1.1
+X-Token: a7f7dfc0-5578-4e5f-b68c-b5c844efc27b
+
+/************* step 6: Get product by ID **************/
+
+GET http://localhost:5000/api/products/66044bb18efd64c4e326a646
+
+/************** step 7: Delete Product ****************/
+
+curl -X DELETE http://localhost:5000/api/products/66044bb18efd64c4e326a646 -H "X-Token: a7f7dfc0-5578-4e5f-b68c-b5c844efc27b"
+
+/************** step 8: As a client, Add 2 orders **************/
+------ order 1 :
+
+POST http://localhost:5000/api/addorder HTTP/1.1
+Content-Type: application/json
+X-Token: 13fea87e-3334-4fe6-8169-79dea2eba6bf
+
+{
+    "attributes": {
+        "product": "66044bab8efd64c4e326a642",
+        "price": 50,
+        "quantity": 5
+    }
+}
+
+-------- order 2 :
+
+POST http://localhost:5000/api/addorder HTTP/1.1
+Content-Type: application/json
+X-Token: 13fea87e-3334-4fe6-8169-79dea2eba6bf
+
+{
+    "attributes": {
+        "product": "66044ba28efd64c4e326a63e",
+        "price": 70,
+        "quantity": 15
+    }
+}
+
+/*************** step 9: as a farmer Get all orders ***************/
+
+GET http://localhost:5000/api/orders HTTP/1.1
+Content-type: application/json
+X-Token: a7f7dfc0-5578-4e5f-b68c-b5c844efc27b
+
+
+/***************** step 10: get orders by product ************/
+
+GET http://localhost:5000/api/orders/66044ba28efd64c4e326a63e HTTP/1.1
+Content-type: application/json
+X-Token: a7f7dfc0-5578-4e5f-b68c-b5c844efc27b
+
+/***************** step 11: update order status ***************/
+
+PUT http://localhost:5000/api/orders/66044c0b8efd64c4e326a655/updateStatus
+Content-Type: application/json
+X-Token: a7f7dfc0-5578-4e5f-b68c-b5c844efc27b
+
+{
+    "attributes": {
+        "status": "delivered"
+    }
+}
+
+/******************* step 12: as client view order history ***************/
+
+GET http://localhost:5000/api/viewOrderHistory HTTP/1.1
+Content-Type: application/json
+X-Token: 13fea87e-3334-4fe6-8169-79dea2eba6bf
