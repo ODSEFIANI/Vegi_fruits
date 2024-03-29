@@ -142,6 +142,16 @@ static async viewProductOrders(request, response) {
 /* -------------------------------------------------------------- */
 
 /* ---------------------- UPDATE ORDER STATUS ---------------------- */
+/**
+ * Update the status of an order
+ * get the order ID from the request parameters
+ * get the status from the request body
+ * query the orders collection to find the order
+ * update the order status
+ * send a success response with the updated order
+ * handle any errors that occur during the process
+ * send an error response if an error occurs
+ */
 static async updateOrderStatus(request, response) {
   try {
     const orderId = request.params.orderId;
