@@ -8,7 +8,14 @@ const { getMe } = require('../controllers/UsersController');
 
 
 class ProductController {
+  /* ------------------- Create a product ------------------- */
     static async CreateProduct(request, response) {
+      /**
+       * Create a new product
+       * insert the product data into the products collection
+       * Add a task related to the newly created product to a product queue
+       * 
+       */
         try {
             const { user, name, price, quantity, description } = request.body;
 
@@ -21,11 +28,9 @@ class ProductController {
                 description 
             };
 
-            // Insert the product data into the products collection
             const result = await dbClient.productsCollection.insertOne(productData);
 
 
-            // Add a task related to the newly created product to a product queu
 
             return response.status(201).json({
                 status: 'success',
@@ -40,19 +45,27 @@ class ProductController {
         }
     
     }
+    /*------------------------------------------------------------*/
+
+    /* ------------------- Add products ------------------- */
     static async addProduct(request, res) {
+      /**
+       * Add a new product
+       * retrieve the user object from the request
+       * extract the user ID from the user object
+       * extract product details from the request body
+       * create a product object
+       * create the product in the database
+       * return a success response with the created product
+       */
         try {
-            // Call getMe function to retrieve the user object
             const user = await getMe(request);
             console.log(user);
-    
-            // Extract user ID from the user object
+
             const userId = user._id.toString();
     
-            // Extract product details from the request body
             const { name, price, quantity, description } = request.body;
     
-            // Create a product object
             const productData = {
                 user: userId, // Use userId directly without accessing _id again
                 name,
@@ -62,10 +75,8 @@ class ProductController {
             };
             console.log(productData);
     
-            // Create the product in the database (assuming Product is a Mongoose model)
             const result = await Product.create(productData);
-    
-          // Return a success response with the created product
+
           return res.status(201).json({
             status: 'success',
             data: {
@@ -81,9 +92,14 @@ class ProductController {
           });
         }
       }
-    
-      // Retrieve all products
+    /*------------------------------------------------------------*/
+
+    /* ------------------- get all products ------------------- */
     static async getAllProducts(req, res) {
+      /**
+       * retrieve all products from the products collection
+       * return a success response with the products
+       */
         try {
         const products = await Product.find();
         return res.status(200).json(products);
@@ -92,8 +108,16 @@ class ProductController {
         return res.status(500).json({ error: 'Error retrieving products' });
         }
     }
-    
+    /*------------------------------------------------------------*/
+
+    /* ------------------- get object byID ------------------- */
     static async getObjectById(req, res) {
+      /**
+       * Retrieve an object by ID
+       * extract the model and objectId from the request parameters
+       * retrieve the object from the database
+       * return a success response with the object
+       */
         try {
           const { model, objectId } = req.params;
           
@@ -113,7 +137,16 @@ class ProductController {
           return res.status(500).json({ error: 'Error retrieving object' });
         }
       }
+    /*------------------------------------------------------------*/
+
+    /* ------------------- Get product by ID ------------------- */
       static async getProductById(req, res) {
+        /**
+         * Retrieve a product by ID
+         * extract the product ID from the request parameters
+         * retrieve the product from the database
+         * return a success response with the product
+         */
         try {
           const productId = req.params.productId;
           const product = await Product.findById(productId);
@@ -128,7 +161,19 @@ class ProductController {
           return res.status(500).json({ error: 'Error retrieving product' });
         }
       }
+    /*------------------------------------------------------------*/
+
+    /* ------------------- Delete product ------------------- */
       static async deleteProductById(req, res) {
+        /**
+         * Delete a product by ID
+         * retrieve the user object from the request
+         * extract the product ID from the request parameters
+         * retrieve the product from the database
+         * check if the user is the owner of the product
+         * delete the product
+         * return a success response
+         */
         try {
             const user = await getMe(req, res);
     
