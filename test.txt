@@ -47,11 +47,11 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiIxMjM0N
 
 
 <<<<<<<<<<<<<<<<<<<<<<<<<<                     >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
+USSSSSSSERRRRR MEEEEEEEEEE EEEEE
 """ Basic implementation of token validation """
 
 GET http://localhost:5000/users/me HTTP/1.1
-X-Token: 95cb8fdb-4800-4088-b53b-dda3af108c60
+X-Token: 86e0b24d-4e03-4945-9343-0674f340db8c
 
 <<<<<<<<<<<<<<<<<<<<<<<<<<                      >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>><>
 
@@ -77,7 +77,7 @@ X-Token: 0000000
 
 POST http://localhost:5000/api/addproduct HTTP/1.1
 Content-Type: application/json
-X-Token: a8ee281f-c664-4144-9bf1-5c86c7a8d737
+X-Token: 86e0b24d-4e03-4945-9343-0674f340db8c
 
 {
     "name": "monga",
@@ -94,9 +94,9 @@ Content-Type: application/json
 X-Token: 4156da15-4603-44cd-8dcb-e9327ac02aed
 
 {
-    "name": "orange",
+    "name": "kiwi",
     "price": 30,
-    "quantity": 1,
+    "quantity": 15,
     "description": "Product Description"
 }
 
@@ -141,8 +141,8 @@ X-Token: 95cb8fdb-4800-4088-b53b-dda3af108c60
 {
   
     "attributes": {
-        "product": "660034f1ad527c1f9d07fad7",
+        "product": "66021474e79a1274ddc85e18",
         "price": 30,
-        "quantity": 2
+        "quantity": 1
     }
 }
